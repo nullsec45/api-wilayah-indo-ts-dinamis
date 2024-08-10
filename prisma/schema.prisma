@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Province {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  regencies Regency[]
+
+  @@map("provinces")
+}
+
+model Regency {
+  id          Int        @id
+  name        String     @db.VarChar(100)
+  province_id Int
+  province    Province   @relation(fields: [province_id], references: [id])
+  District    District[]
+
+  @@map("regencies")
+}
+
+model District {
+  id         Int       @id
+  name       String    @db.VarChar(100)
+  regency_id Int
+  regency    Regency   @relation(fields: [regency_id], references: [id])
+  Village    Village[]
+
+  @@map("disctricts")
+}
+
+model Village {
+  id          Int      @id
+  name        String   @db.VarChar(100)
+  district_id Int
+  district    District @relation(fields: [district_id], references: [id])
+
+  @@map("villages")
+}
