@@ -46,6 +46,15 @@ model Village {
   name        String   @db.VarChar(100)
   district_id Int
   district    District @relation(fields: [district_id], references: [id])
+  postal_code String   @db.VarChar(10)
 
   @@map("villages")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(100)
+  password String @db.VarChar(255)
+
+  @@map("users") // Letakkan di sini, sebelum penutup kurung
 }
