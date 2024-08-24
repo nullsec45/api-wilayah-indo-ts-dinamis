@@ -27,13 +27,15 @@ class ProvinceController implements IController{
     }
 
     show= async (req:Request, res:Response, next:NextFunction) => {
-        // try{
-        //     const result=await ProvinceService.create(req.body);
+        try{
+            const result=await ProvinceService.get(parseInt(req.params.id));
 
-        //     return result;
-        // }catch(error){
-        //     next(error);
-        // }
+            res.status(200).json({
+                data: result,
+            });
+        }catch(error){
+            next(error);
+        }
         
     }
 
