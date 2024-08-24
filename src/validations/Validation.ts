@@ -4,7 +4,7 @@ import Joi, { Schema } from 'joi';
 
 class Validation{
    
-    static validate<T extends Schema>(schema:T,request:Request){
+    static validate<T extends Schema>(schema:T,request:Request | any){
         const result = schema.validate(request, {
             abortEarly: false,
             allowUnknown: false,
