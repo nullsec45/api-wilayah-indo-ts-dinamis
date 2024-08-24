@@ -4,4 +4,9 @@ const createProvinceValidation=Joi.object({
     name:Joi.string().min(3)
 });
 
-export {createProvinceValidation}
+const getProvinceValidation=Joi.number().min(1).positive().required();
+
+export {
+    createProvinceValidation,
+    getProvinceValidation
+}
