@@ -1,7 +1,12 @@
 import { Request } from "express";
 import { prismaClient } from "../applications/database";
 import Validation from "../validations/Validation";
-import { createProvinceValidation } from "../validations/province-validation";
+import { 
+    createProvinceValidation, 
+    getProvinceValidation 
+
+} from "../validations/province-validation";
+import ResponseError from "../errors/ResponseError";
 
 class ProvinceService{
     static create(request:Request){
@@ -14,6 +19,26 @@ class ProvinceService{
                 name:true
             }
         })
+    }
+
+    static async get(id:number){
+        const provinceId=Validation.validate(getProvinceValidation, id);
+
+        const province=await prismaClient.province.findFirst({
+            where:{
+                id:provinceId
+            },
+            select:{
+                id:true,
+                name:true
+            }
+        })
+
+        if(!province){
+            throw new ResponseError(404, "province not found");
+        }
+
+        return province;
     }
 }
 
