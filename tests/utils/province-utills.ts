@@ -14,7 +14,23 @@ const createTestProvince=async () => {
 
     return province;
 }
+
+const getTestProvince=async () => {
+   let province= await prismaClient.province.findFirst({
+        where:{
+            name:"Province Test"
+        },
+        select:{
+            id:true,
+            name:true
+        }
+    })
+
+    return province;
+}
+
 export {
     removeTestProvince,
-    createTestProvince
+    createTestProvince,
+    getTestProvince
 }
