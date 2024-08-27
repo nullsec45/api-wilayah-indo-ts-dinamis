@@ -28,7 +28,8 @@ class ProvinceController implements IController{
 
     show= async (req:Request, res:Response, next:NextFunction) => {
         try{
-            const result=await ProvinceService.get(parseInt(req.params.id));
+            const provinceId=parseInt(req.params.id);
+            const result=await ProvinceService.get(provinceId);
 
             res.status(200).json({
                 data: result,
@@ -40,24 +41,32 @@ class ProvinceController implements IController{
     }
 
     update= async (req:Request, res:Response, next:NextFunction) => {
-        // try{
-        //     const result=await ProvinceService.create(req.body);
+        try{
+            const id=parseInt(req.params.id);
+            const request=req.body;
+            const result=await ProvinceService.update(id, request);
 
-        //     return result;
-        // }catch(error){
-        //     next(error);
-        // }
+            res.status(200).json({
+                message:"Update Success",
+                data: result,
+            });
+        }catch(error){
+            next(error);
+        }
         
     }
 
     delete= async (req:Request, res:Response, next:NextFunction) => {
-        // try{
-        //     const result=await ProvinceService.create(req.body);
+        try{
+            const provinceId=parseInt(req.params.id);
+            await ProvinceService.remove(provinceId);
 
-        //     return result;
-        // }catch(error){
-        //     next(error);
-        // }
+            res.status(200).json({
+                 message: "Delete Success",
+            });
+        }catch(error){
+            next(error);
+        }
         
     }
 }
