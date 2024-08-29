@@ -29,8 +29,19 @@ const getTestProvince=async () => {
     return province;
 }
 
+const createManyTestProvince=async () => {
+    for(let i=0;i  <  15;i++){
+        await prismaClient.province.create({
+            data:{
+                name:`Province ${i}`
+            }
+        });
+    }
+}
+
 export {
     removeTestProvince,
     createTestProvince,
-    getTestProvince
+    getTestProvince,
+    createManyTestProvince
 }
