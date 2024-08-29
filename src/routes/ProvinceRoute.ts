@@ -4,6 +4,7 @@ import ProvinceController from "../controllers/ProvinceController";
 
 class ProvinceRoutes extends BaseRoutes{
     public routes():void{
+        this.router.get("/", ProvinceController.index);
         this.router.post("/", ProvinceController.create);
         this.router.get("/:id", ProvinceController.show);
         this.router.put("/:id", ProvinceController.update);
