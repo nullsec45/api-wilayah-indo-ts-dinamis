@@ -40,7 +40,7 @@ class ProvinceService{
         })
 
         if(!province){
-            throw new ResponseError(404, "province not found");
+            throw new ResponseError(404, "Province is not found");
         }
 
         return province;
@@ -49,14 +49,14 @@ class ProvinceService{
     static async update(id:number, request:Request){
         const province=Validation.validate(updateProvinceValidation, request);
 
-        const checkContact = await prismaClient.province.count({
+        const checkProvince = await prismaClient.province.count({
             where: {
                 id
             },
         });
 
-        if (checkContact == 0) {
-            throw new ResponseError(404, "Contact is not found!");
+        if (checkProvince == 0) {
+            throw new ResponseError(404, "Province is not found!");
         }
 
         return prismaClient.province.update({
@@ -76,14 +76,14 @@ class ProvinceService{
     static async remove(id:number){
        const provinceId =Validation.validate(getProvinceValidation, id);
 
-        const checkContact = await prismaClient.province.count({
+        const checkProvince = await prismaClient.province.count({
             where: {
                 id:provinceId,
             },
         });
 
-        if (checkContact == 0) {
-            throw new ResponseError(404, "contact is not found");
+        if (checkProvince == 0) {
+            throw new ResponseError(404, "Province is not found");
         }
 
         return prismaClient.province.delete({
