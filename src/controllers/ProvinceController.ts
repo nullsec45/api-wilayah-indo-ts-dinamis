@@ -4,19 +4,22 @@ import IController from "./ControllerInterface";
 
 class ProvinceController implements IController{
     index= async (req:Request, res:Response, next:NextFunction) => {
-        // try{
-        //     const result=await ProvinceService.create(req.body);
-
-        //     return result;
-        // }catch(error){
-        //     next(error);
-        // }
+        try{
+            const result=await ProvinceService.index();
+            
+            res.status(200).json({
+                data: result,
+            });
+        }catch(error){
+            next(error);
+        }
         
     }
 
     create= async (req:Request, res:Response, next:NextFunction) => {
         try{
             const result=await ProvinceService.create(req.body);
+            
             res.status(200).json({
                 data: result,
             });
