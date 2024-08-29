@@ -10,6 +10,10 @@ import {
 import ResponseError from "../errors/ResponseError";
 
 class ProvinceService{
+    static index(){
+        return prismaClient.province.findMany({});
+    }
+
     static create(request:Request){
         const province=Validation.validate(createProvinceValidation, request);
 
