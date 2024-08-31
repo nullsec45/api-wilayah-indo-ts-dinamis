@@ -9,6 +9,10 @@ const createTestProvince=async () => {
    let province= await prismaClient.province.create({
         data:{
             name:"Province Test"
+        },
+        select:{
+            id:true,
+            name:true
         }
     })
 
