@@ -29,6 +29,18 @@ import { removeTestProvince, createTestProvince } from "./utils/province-utills"
         expect(result.status).toBe(200);
         expect(result.body.data.name).toBe("Regency Test");
     });
+
+    it("should reject if request not valid", async() => {
+        const result=await supertest(server).post("/api/v1/regencies").send({
+            name:"",
+            province_id:""
+        });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(400);
+        expect(result.body.errors).toBeDefined();
+    });
  });
 
 describe.skip("GET /api/v1/regencies/:id", function(){
@@ -52,6 +64,14 @@ describe.skip("GET /api/v1/regencies/:id", function(){
         expect(result.status).toBe(200);
         expect(result.body.data.name).toBe("Regency Test");
     });
+
+    it("should return 404 if regency id is not found", async() => {
+        const result=await supertest(server).get("/api/v1/regencies/99");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(404);
+    });
 });
 
 describe.skip("PUT /api/v1/regencies/:id", function(){
@@ -66,7 +86,7 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
         await  removeTestProvince();
     });
 
-     it("should can update regency", async() => {
+    it("should can update regency", async() => {
 
         const result=await supertest(server).put("/api/v1/regencies/"+regency.id).send({
             name:"Regency Update",
@@ -76,6 +96,29 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
 
         expect(result.status).toBe(200);
         expect(result.body.data.name).toBe("Regency Update");
+    });
+
+    it("should return 404 if regency id is not found", async() => {
+        const result=await supertest(server).put("/api/v1/regencies/99").send({
+            name:"Regency Test",
+        });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(404);
+    });
+
+
+    it("should reject if request not valid", async() => {
+        const result=await supertest(server).put("/api/v1/regencies/"+regency.id).send({
+            name:"",
+            province_id:""
+        });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(400);
+        expect(result.body.errors).toBeDefined();
     });
 });
 
@@ -103,5 +146,33 @@ describe("DELETE /api/v1/regencies/:id", function(){
 
         testRegency = await getTestRegency();
         expect(testRegency).toBeNull();
+    });
+
+     it("should return 404 if regency id is not found", async() => {
+        const result=await supertest(server).delete("/api/v1/regencies/99");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(404);
+    });
+});
+
+describe.skip("GET /api/v1/regencies/", () => {
+    let regency:any=null;
+
+    beforeEach(async() => {
+        regency=await createManyTestRegency();
+    });
+
+    afterEach(async() => {
+        await removeTestRegency();
+        await removeTestProvince();
+    });
+
+    it("should can get all provinces", async() => {
+        const result=await supertest(server).get("/api/v1/regencies");
+
+        expect(result.status).toBe(200);
+        expect(result.body.data.length).toBe(15);
     });
 });
