@@ -22,7 +22,7 @@ model Province {
 }
 
 model Regency {
-  id          Int        @id
+  id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(100)
   province_id Int
   province    Province   @relation(fields: [province_id], references: [id])
@@ -32,7 +32,7 @@ model Regency {
 }
 
 model District {
-  id         Int       @id
+  id         Int       @id @default(autoincrement())
   name       String    @db.VarChar(100)
   regency_id Int
   regency    Regency   @relation(fields: [regency_id], references: [id])
@@ -42,7 +42,7 @@ model District {
 }
 
 model Village {
-  id          Int      @id
+  id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(100)
   district_id Int
   district    District @relation(fields: [district_id], references: [id])
