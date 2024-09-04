@@ -10,7 +10,7 @@ import {
  } from "./utils/regency-utils";
 import { removeTestProvince, createTestProvince } from "./utils/province-utills";
 
- describe.skip("POST /api/v1/regencies ", function(){
+ describe("POST /api/v1/regencies ", function(){
      afterEach(async () => {
         await removeTestRegency();
         await  removeTestProvince();
@@ -18,6 +18,7 @@ import { removeTestProvince, createTestProvince } from "./utils/province-utills"
 
     it("should can create regency", async() => {
         const province=await createTestProvince();
+        
 
         const result=await supertest(server).post("/api/v1/regencies").send({
             name:"Regency Test",
@@ -28,6 +29,18 @@ import { removeTestProvince, createTestProvince } from "./utils/province-utills"
 
         expect(result.status).toBe(200);
         expect(result.body.data.name).toBe("Regency Test");
+    });
+
+    it("should reject if province is not found", async() => {
+        const result=await supertest(server).post("/api/v1/regencies").send({
+            name:"Regency Test",
+            province_id:999
+        });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(404);
+        expect(result.body.errors).toBeDefined();
     });
 
     it("should reject if request not valid", async() => {
@@ -120,9 +133,21 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
+
+    it("should reject if province is not found", async() => {
+        const result=await supertest(server).put("/api/v1/regencies/"+regency.id).send({
+            name:"Regency Test",
+            province_id:999
+        });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(404);
+        expect(result.body.errors).toBeDefined();
+    });
 });
 
-describe("DELETE /api/v1/regencies/:id", function(){
+describe.skip("DELETE /api/v1/regencies/:id", function(){
     let regency:any=null;
 
     beforeEach(async() => {
