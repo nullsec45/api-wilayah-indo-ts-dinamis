@@ -7,14 +7,20 @@ import {
     updateRegencyValidation 
 } from "../validations/regency-validation";
 import ResponseError from "../errors/ResponseError";
+import ProvinceService from "./ProvinceService";
 
 class RegencyService{
     static index(){
         return prismaClient.regency.findMany({});
     }
 
-    static create(request:Request){
+    static async create(request:Request){
         const regency=Validation.validate(createRegencyValidation, request);
+
+        
+        if(!await ProvinceService.checkExistsProvince(regency.province_id)){
+            throw new ResponseError(404, "Province is not found");
+        }
 
         return prismaClient.regency.create({
             data:regency,
@@ -60,6 +66,10 @@ class RegencyService{
             throw new ResponseError(404, "Regency is not found!");
         }
 
+        if(!await ProvinceService.checkExistsProvince(regency.province_id)){
+            throw new ResponseError(404, "Province is not found");
+        }
+
         return prismaClient.regency.update({
             where:{
                 id
@@ -93,6 +103,17 @@ class RegencyService{
               id: regencyId,
             },
         });
+    }   
+
+
+    static async checkExistsRegency(id:number){
+        const checkProvince = await prismaClient.regency.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkProvince !== null;  
     }
 }
 
