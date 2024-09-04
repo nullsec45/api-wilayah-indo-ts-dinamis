@@ -14,6 +14,10 @@ const createTestRegency=async () => {
              province: {
                connect: { id: province.id } 
            }
+        },
+        select:{
+            id:true,
+            name:true
         }
     })
 
@@ -21,7 +25,7 @@ const createTestRegency=async () => {
 }
 
 const getTestRegency=async () => {
-   let province= await prismaClient.regency.findFirst({
+   let regency= await prismaClient.regency.findFirst({
         where:{
             name:"Regency Test"
         },
@@ -32,7 +36,7 @@ const getTestRegency=async () => {
         }
     })
 
-    return province
+    return regency
 };
 
 const createManyTestRegency=async () => {
