@@ -92,6 +92,16 @@ class ProvinceService{
             },
         });
     }
+
+    static async checkExistsProvince(id:number){
+        const checkProvince = await prismaClient.province.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkProvince !== null;  
+    }
 }
 
 export default ProvinceService;
