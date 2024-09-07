@@ -10,8 +10,8 @@ import {
  } from "./utils/regency-utils";
 import { removeTestProvince, createTestProvince } from "./utils/province-utills";
 
- describe("POST /api/v1/regencies ", function(){
-     afterEach(async () => {
+describe("POST /api/v1/regencies ", function(){
+    afterEach(async () => {
         await removeTestRegency();
         await removeTestProvince();
     });
@@ -54,7 +54,7 @@ import { removeTestProvince, createTestProvince } from "./utils/province-utills"
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
- });
+});
 
 describe.skip("GET /api/v1/regencies/:id", function(){
     let regency:any=null;
@@ -195,7 +195,7 @@ describe.skip("GET /api/v1/regencies/", () => {
         await removeTestProvince();
     });
 
-    it("should can get all provinces", async() => {
+    it("should can get all regencies", async() => {
         const result=await supertest(server).get("/api/v1/regencies");
 
         expect(result.status).toBe(200);
