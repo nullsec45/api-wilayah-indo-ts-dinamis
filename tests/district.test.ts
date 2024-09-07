@@ -8,15 +8,17 @@ import {
     createManyTestDistrict
 } from "./utils/district-utils";
 import { createTestRegency, removeTestRegency } from "./utils/regency-utils";
+import { removeTestProvince } from "./utils/province-utills";
 
 describe.skip("POST /api/v1/districts", function(){
     afterEach(async () => {
-       await  removeTestDistrict();
-       await removeTestRegency();
+        await removeTestDistrict();
+        await removeTestRegency();
+        await removeTestProvince();
     });
 
     it("should can create district", async() => {
-          const regency=await createTestRegency();
+        const regency=await createTestRegency();
 
         const result=await supertest(server).post("/api/v1/districts").send({
             name:"District Test",
@@ -64,6 +66,7 @@ describe.skip("GET /api/v1/districts/:id", function(){
     afterEach(async() => {
         await removeTestDistrict();
         await removeTestRegency();
+        await removeTestProvince();
     });
 
      it("should can get regency", async() => {
@@ -95,6 +98,7 @@ describe.skip("PUT /api/v1/districts/:id", function(){
     afterEach(async() => {
         await removeTestDistrict();
         await removeTestRegency();
+        await removeTestProvince();
     });
 
     it("should can update district", async() => {
@@ -154,6 +158,8 @@ describe.skip("DELETE /api/v1/districts/:id",() => {
 
     afterEach(async() => {
         await removeTestDistrict();
+        await removeTestRegency();
+        await removeTestProvince();
     });
 
     it("should can delete district", async() => {
@@ -188,6 +194,8 @@ describe("GET /api/v1/districts/", () => {
 
     afterEach(async() => {
         await removeTestDistrict();
+        await removeTestRegency();
+        await removeTestProvince();
     });
 
     it("should can get all districts", async() => {
