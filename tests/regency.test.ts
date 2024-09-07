@@ -13,7 +13,7 @@ import { removeTestProvince, createTestProvince } from "./utils/province-utills"
  describe("POST /api/v1/regencies ", function(){
      afterEach(async () => {
         await removeTestRegency();
-        await  removeTestProvince();
+        await removeTestProvince();
     });
 
     it("should can create regency", async() => {
@@ -157,9 +157,10 @@ describe.skip("DELETE /api/v1/regencies/:id", function(){
     afterEach(async() => {
         await removeTestRegency();
         await  removeTestProvince();
+
     });
 
-     it("should can update regency", async() => {
+    it("should can delete regency", async() => {
         let testRegency = await getTestRegency();
 
         const result=await supertest(server).delete("/api/v1/regencies/"+testRegency.id);
@@ -173,7 +174,7 @@ describe.skip("DELETE /api/v1/regencies/:id", function(){
         expect(testRegency).toBeNull();
     });
 
-     it("should return 404 if regency id is not found", async() => {
+    it("should return 404 if regency id is not found", async() => {
         const result=await supertest(server).delete("/api/v1/regencies/99");
 
         logger.info(result.body);
