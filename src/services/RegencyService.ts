@@ -75,7 +75,8 @@ class RegencyService{
                 id
             },
             data:{
-                name:regency.name
+                name:regency.name,
+                province_id:regency.province_id
             },
             select:{
                 id:true,
