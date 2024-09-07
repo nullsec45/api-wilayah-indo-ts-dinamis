@@ -14,6 +14,11 @@ const createTestDistrict=async () => {
              regency: {
                connect: { id: regency.id } 
            }
+        },
+        select:{
+            id:true,
+            regency_id:true,
+            name:true
         }
     })
 
