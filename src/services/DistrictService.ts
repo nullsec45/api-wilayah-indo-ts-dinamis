@@ -19,7 +19,7 @@ class DistrictService{
 
         
         if(!await RegencyService.checkExistsRegency(district.regency_id)){
-            throw new ResponseError(404, "Province is not found");
+            throw new ResponseError(404, "Regency is not found");
         }
 
         return prismaClient.district.create({
@@ -75,7 +75,8 @@ class DistrictService{
                 id
             },
             data:{
-                name:district.name
+                name:district.name,
+                regency_id:district.regency_id
             },
             select:{
                 id:true,
@@ -103,7 +104,17 @@ class DistrictService{
               id: regencyId,
             },
         });
-    }   
+    }
+    
+     static async checkExistsDistrict(id:number){
+        const checkDistrict = await prismaClient.district.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkDistrict !== null;  
+    }
 }
 
 export default DistrictService;
