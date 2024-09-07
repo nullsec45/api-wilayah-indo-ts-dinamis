@@ -10,7 +10,7 @@ const createTestDistrict=async () => {
    const regency=await createTestRegency();
    const district= await prismaClient.district.create({
         data:{
-            name:"Regency Test",
+            name:"District Test",
              regency: {
                connect: { id: regency.id } 
            }
@@ -41,7 +41,7 @@ const createManyTestDistrict=async () => {
     for(let i=0;i  <  15;i++){
         await prismaClient.district.create({
            data:{
-              name:`Regency ${i}`,
+              name:`District ${i}`,
                 regency: {
                   connect: { id: regency.id } 
                 }
