@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import VillageService from "../services/VillageService";
 import IController from "./ControllerInterface";
-import { logger } from "../applications/logging";
 
 class VillageController implements IController{
     index= async (req:Request, res:Response, next:NextFunction) => {
