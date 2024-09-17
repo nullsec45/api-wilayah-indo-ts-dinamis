@@ -54,7 +54,9 @@ model Village {
 model User {
   id       Int    @id @default(autoincrement())
   username String @db.VarChar(100)
+  name String @db.VarChar(100)
   password String @db.VarChar(255)
+  token String? @db.VarChar(100)
 
-  @@map("users") // Letakkan di sini, sebelum penutup kurung
+  @@map("users") 
 }
