@@ -2,8 +2,14 @@ import { UserRequest } from "../../types/user-request";
 import { prismaClient } from "../applications/database";
 import {  Response, NextFunction } from "express";
 
-const authMiddleware = async (err: any, req: UserRequest, res: Response, next: NextFunction) => {
-  const token=req.get("X-Token");
+const authMiddleware = async ( req: UserRequest, res: Response, next: NextFunction) => {
+  const token=req.get("X-API-TOKEN");
+
+  if (!token) {
+    return res.status(401).json({
+      errors: "Unauthorized: Token is missing"
+    });
+  }
 
   if(token){
     const user=await prismaClient.user.findFirst({
@@ -12,15 +18,14 @@ const authMiddleware = async (err: any, req: UserRequest, res: Response, next: N
         }
     });
 
-    if(user){
-        req.user=user;
-        next();
-        return;
+    if (!user) {
+      return res.status(401).json({
+        errors: "Unauthorized: Invalid token"
+      });
     }
 
-    res.status(401).json({
-      errors:"Unathorized"
-    }).end();
+    req.user = user;
+    next(); // Move to the next middleware or route handler
   }
 };
 
