@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "API Wilayah Indonesia",
   "scripts": {
-    "test": "jest --detectOpenHandles ./tests/user.test.ts",
+    "test": "jest --detectOpenHandles ./tests/",
     "start-dev": "nodemon ./src/main.ts"
   },
   "keywords": [],
