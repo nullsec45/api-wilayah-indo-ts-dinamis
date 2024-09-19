@@ -1,7 +1,7 @@
 import BaseRoutes from "./BaseRoutes";
 
 import UserController from "../controllers/UserController";
-import {authMiddleware} from "../middlewares/auth-middleware"
+import {authMiddleware} from "../middlewares/auth-middleware";
 
 class UserRoutes extends BaseRoutes{
     public routes():void{
