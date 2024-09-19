@@ -78,7 +78,9 @@ class VillageService{
                 id
             },
             data:{
-                name:village.name
+                name:village.name,
+                district_id:village.district_id,
+                postal_code:village.postal_code
             },
             select:{
                 id:true,
