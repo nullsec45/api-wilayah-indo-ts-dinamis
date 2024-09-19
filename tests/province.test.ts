@@ -7,17 +7,24 @@ import {
     getTestProvince,
     createManyTestProvince
 } from "./utils/province-utills";
+import {createUser, deleteUser} from "./utils/user-utils";
 
-
-describe.skip("POST /api/v1/provinces", function(){
-    afterEach(async () => {
-       await  removeTestProvince();
+describe("POST /api/v1/provinces", function(){
+    beforeEach(async() => {
+        await createUser();
     });
 
-    it.skip("should can create province", async() => {
-        const result=await supertest(server).post("/api/v1/provinces").send({
-            name:"DKI Jakarta"
-        });
+    afterEach(async () => {
+       await removeTestProvince();
+       await deleteUser();
+    });
+
+    it("should can create province", async() => {
+        const result=await supertest(server).post("/api/v1/provinces")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                 name:"DKI Jakarta"
+                                            });
 
         logger.info(result.body);
 
@@ -26,9 +33,12 @@ describe.skip("POST /api/v1/provinces", function(){
     });
 
     it("should reject if request is not valid", async() => {
-        const result=await supertest(server).post("/api/v1/provinces").send({
-            name:""
-        });
+        const result=await supertest(server)
+                            .post("/api/v1/provinces")
+                            .set("X-API-TOKEN","test")
+                            .send({
+                                name:""
+                            });
 
         logger.info(result.body);
 
@@ -37,7 +47,7 @@ describe.skip("POST /api/v1/provinces", function(){
     });
 });
 
-describe.skip("GET /api/v1/provinces/:id", function(){
+describe("GET /api/v1/provinces/:id", function(){
     let province:any=null;
 
     beforeEach(async() => {
@@ -66,20 +76,23 @@ describe.skip("GET /api/v1/provinces/:id", function(){
      });
 });
 
-describe.skip("PUT /api/v1/provinces/:id", function(){
+describe("PUT /api/v1/provinces/:id", function(){
     let province:any=null;
 
     beforeEach(async() => {
+        await createUser();
         province=await createTestProvince();
     });
 
     afterEach(async () => {
-       await  removeTestProvince();
+       await deleteUser();
+       await removeTestProvince();
     });
 
     it("should can get province", async() => {
         const result=await supertest(server)
                            .put("/api/v1/provinces/"+province.id)
+                           .set("X-API-TOKEN","test")
                            .send({
                                 name:"Province Update"
                            });
@@ -92,17 +105,21 @@ describe.skip("PUT /api/v1/provinces/:id", function(){
     });
 
     it("should return 404 if province id is not found", async () => {
-        const result = await supertest(server).put("/api/v1/provinces/99").send({
-            name:"DKI Jakarta"
-        });
+        const result = await supertest(server).put("/api/v1/provinces/99")
+                                              .set("X-API-TOKEN","test")
+                                              .send({
+                                                name:"DKI Jakarta"
+                                               });
 
         expect(result.status).toBe(404);
     });
 
     it("should reject if request is not valid", async() => {
-        const result=await supertest(server).put("/api/v1/provinces/"+province.id).send({
-            name:""
-        });
+        const result=await supertest(server).put("/api/v1/provinces/"+province.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:""
+                                            });
 
         logger.info(result.body);
 
@@ -115,10 +132,12 @@ describe("DELETE /api/v1/provinces/:id", function(){
     let province:any=null;
 
     beforeEach(async() => {
+        await createUser();
         province=await createTestProvince();
     });
 
     afterEach(async () => {
+       await deleteUser();
        await removeTestProvince();
     });
 
@@ -126,7 +145,8 @@ describe("DELETE /api/v1/provinces/:id", function(){
         let testProvince = await getTestProvince();
 
         const result=await supertest(server)
-                           .delete("/api/v1/provinces/"+testProvince.id);
+                            .delete("/api/v1/provinces/"+testProvince.id)
+                            .set("X-API-TOKEN","test");
 
         logger.info(result.body);
 
@@ -138,13 +158,15 @@ describe("DELETE /api/v1/provinces/:id", function(){
     });
 
     it("should return 404 if province id is not found", async () => {
-        const result = await supertest(server).delete("/api/v1/provinces/99");
+        const result = await supertest(server)
+                            .delete("/api/v1/provinces/99")
+                            .set("X-API-TOKEN","test");
 
         expect(result.status).toBe(404);
     });
 });
 
-describe.skip("GET /api/v1/provinces", function(){
+describe("GET /api/v1/provinces", function(){
     let province:any=null;
 
     beforeEach(async() => {

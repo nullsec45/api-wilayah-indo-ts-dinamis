@@ -9,9 +9,15 @@ import {
 } from "./utils/district-utils";
 import { createTestRegency, removeTestRegency } from "./utils/regency-utils";
 import { removeTestProvince } from "./utils/province-utills";
+import {createUser, deleteUser} from "./utils/user-utils";
 
-describe.skip("POST /api/v1/districts", function(){
+describe("POST /api/v1/districts", function(){
+    beforeEach(async() => {
+        await createUser();
+    });
+
     afterEach(async () => {
+        await deleteUser();
         await removeTestDistrict();
         await removeTestRegency();
         await removeTestProvince();
@@ -20,10 +26,12 @@ describe.skip("POST /api/v1/districts", function(){
     it("should can create district", async() => {
         const regency=await createTestRegency();
 
-        const result=await supertest(server).post("/api/v1/districts").send({
-            name:"District Test",
-            regency_id:regency.id
-        });
+        const result=await supertest(server).post("/api/v1/districts")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"District Test",
+                                                regency_id:regency.id
+                                            });
 
         logger.info(result.body);
 
@@ -32,10 +40,12 @@ describe.skip("POST /api/v1/districts", function(){
     });
     
     it("should reject if province is not found", async() => {
-        const result=await supertest(server).post("/api/v1/districts").send({
-            name:"District Test",
-            regency_id:999
-        });
+        const result=await supertest(server).post("/api/v1/districts")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"District Test",
+                                                regency_id:999
+                                            });
 
         logger.info(result.body);
 
@@ -44,10 +54,12 @@ describe.skip("POST /api/v1/districts", function(){
     });
 
     it("should reject if request is not valid", async() => {
-        const result=await supertest(server).post("/api/v1/districts").send({
-            name:"",
-            regency_id:""
-        });
+        const result=await supertest(server).post("/api/v1/districts")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"",
+                                                regency_id:""
+                                            });
 
         logger.info(result.body);
 
@@ -56,7 +68,7 @@ describe.skip("POST /api/v1/districts", function(){
     });
 });
 
-describe.skip("GET /api/v1/districts/:id", function(){
+describe("GET /api/v1/districts/:id", function(){
     let district:any=null;
 
     beforeEach(async() => {
@@ -88,14 +100,16 @@ describe.skip("GET /api/v1/districts/:id", function(){
     });
 });
 
-describe.skip("PUT /api/v1/districts/:id", function(){
+describe("PUT /api/v1/districts/:id", function(){
     let district:any=null;
 
     beforeEach(async() => {
+        await createUser();
         district=await createTestDistrict();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestDistrict();
         await removeTestRegency();
         await removeTestProvince();
@@ -103,9 +117,11 @@ describe.skip("PUT /api/v1/districts/:id", function(){
 
     it("should can update district", async() => {
 
-        const result=await supertest(server).put("/api/v1/districts/"+district.id).send({
-            name:"District Update",
-        });;
+        const result=await supertest(server).put("/api/v1/districts/"+district.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"District Update",
+                                            });;
 
         logger.info(result.body);
 
@@ -114,9 +130,11 @@ describe.skip("PUT /api/v1/districts/:id", function(){
     });
 
     it("should return 404 if district id is not found", async() => {
-        const result=await supertest(server).put("/api/v1/districts/99").send({
-            name:"District Test",
-        });
+        const result=await supertest(server).put("/api/v1/districts/99")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"District Test",
+                                            });
 
         logger.info(result.body);
 
@@ -125,10 +143,12 @@ describe.skip("PUT /api/v1/districts/:id", function(){
 
 
     it("should reject if request not valid", async() => {
-        const result=await supertest(server).put("/api/v1/regencies/"+district.id).send({
-            name:"",
-            regency_id:""
-        });
+        const result=await supertest(server).put("/api/v1/regencies/"+district.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"",
+                                                regency_id:""
+                                            });
 
         logger.info(result.body);
 
@@ -137,10 +157,12 @@ describe.skip("PUT /api/v1/districts/:id", function(){
     });
 
     it("should reject if regency is not found", async() => {
-        const result=await supertest(server).put("/api/v1/districts/"+district.id).send({
-            name:"District Test",
-            regency_id:999
-        });
+        const result=await supertest(server).put("/api/v1/districts/"+district.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"District Test",
+                                                regency_id:999
+                                            });
 
         logger.info(result.body);
 
@@ -149,14 +171,16 @@ describe.skip("PUT /api/v1/districts/:id", function(){
     });
 });
 
-describe.skip("DELETE /api/v1/districts/:id",() => {
+describe("DELETE /api/v1/districts/:id",() => {
     let district:any=null;
 
     beforeEach(async() => {
+        await createUser();
         district=await createTestDistrict();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestDistrict();
         await removeTestRegency();
         await removeTestProvince();
@@ -165,7 +189,8 @@ describe.skip("DELETE /api/v1/districts/:id",() => {
     it("should can delete district", async() => {
         let testDistrict = await getTestDistrict();
 
-        const result=await supertest(server).delete("/api/v1/districts/"+testDistrict.id);
+        const result=await supertest(server).delete("/api/v1/districts/"+testDistrict.id)
+                                            .set("X-API-TOKEN","test");
 
         logger.info(result.body);
 
@@ -177,7 +202,9 @@ describe.skip("DELETE /api/v1/districts/:id",() => {
     });
 
     it("should return 404 if district id is not found", async() => {
-        const result=await supertest(server).delete("/api/v1/districts/99");
+        const result=await supertest(server).delete("/api/v1/districts/99")
+                                            .set("X-API-TOKEN","test");
+
 
         logger.info(result.body);
 

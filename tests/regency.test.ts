@@ -9,8 +9,13 @@ import {
     createManyTestRegency
  } from "./utils/regency-utils";
 import { removeTestProvince, createTestProvince } from "./utils/province-utills";
+import {createUser, deleteUser} from "./utils/user-utils";
 
 describe("POST /api/v1/regencies ", function(){
+    beforeEach(async() => {
+        await createUser();
+    });
+
     afterEach(async () => {
         await removeTestRegency();
         await removeTestProvince();
@@ -20,10 +25,12 @@ describe("POST /api/v1/regencies ", function(){
         const province=await createTestProvince();
         
 
-        const result=await supertest(server).post("/api/v1/regencies").send({
-            name:"Regency Test",
-            province_id:province.id
-        });
+        const result=await supertest(server).post("/api/v1/regencies")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Test",
+                                                province_id:province.id
+                                            });
 
         logger.info(result.body);
 
@@ -32,10 +39,12 @@ describe("POST /api/v1/regencies ", function(){
     });
 
     it("should reject if province is not found", async() => {
-        const result=await supertest(server).post("/api/v1/regencies").send({
-            name:"Regency Test",
-            province_id:999
-        });
+        const result=await supertest(server).post("/api/v1/regencies")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Test",
+                                                province_id:999
+                                            });
 
         logger.info(result.body);
 
@@ -44,10 +53,12 @@ describe("POST /api/v1/regencies ", function(){
     });
 
     it("should reject if request not valid", async() => {
-        const result=await supertest(server).post("/api/v1/regencies").send({
-            name:"",
-            province_id:""
-        });
+        const result=await supertest(server).post("/api/v1/regencies")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"",
+                                                province_id:""
+                                            });
 
         logger.info(result.body);
 
@@ -56,7 +67,7 @@ describe("POST /api/v1/regencies ", function(){
     });
 });
 
-describe.skip("GET /api/v1/regencies/:id", function(){
+describe("GET /api/v1/regencies/:id", function(){
     let regency:any=null;
 
     beforeEach(async() => {
@@ -87,23 +98,27 @@ describe.skip("GET /api/v1/regencies/:id", function(){
     });
 });
 
-describe.skip("PUT /api/v1/regencies/:id", function(){
+describe("PUT /api/v1/regencies/:id", function(){
     let regency:any=null;
 
     beforeEach(async() => {
+        await createUser();
         regency=await createTestRegency();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestRegency();
-        await  removeTestProvince();
+        await removeTestProvince();
     });
 
     it("should can update regency", async() => {
 
-        const result=await supertest(server).put("/api/v1/regencies/"+regency.id).send({
-            name:"Regency Update",
-        });;
+        const result=await supertest(server).put("/api/v1/regencies/"+regency.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Update",
+                                            });;
 
         logger.info(result.body);
 
@@ -112,9 +127,11 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
     });
 
     it("should return 404 if regency id is not found", async() => {
-        const result=await supertest(server).put("/api/v1/regencies/99").send({
-            name:"Regency Test",
-        });
+        const result=await supertest(server).put("/api/v1/regencies/99")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Test",
+                                            });
 
         logger.info(result.body);
 
@@ -123,10 +140,12 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
 
 
     it("should reject if request not valid", async() => {
-        const result=await supertest(server).put("/api/v1/regencies/"+regency.id).send({
-            name:"",
-            province_id:""
-        });
+        const result=await supertest(server).put("/api/v1/regencies/"+regency.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"",
+                                                province_id:""
+                                            });
 
         logger.info(result.body);
 
@@ -135,10 +154,12 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
     });
 
     it("should reject if province is not found", async() => {
-        const result=await supertest(server).put("/api/v1/regencies/"+regency.id).send({
-            name:"Regency Test",
-            province_id:999
-        });
+        const result=await supertest(server).put("/api/v1/regencies/"+regency.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Test",
+                                                province_id:999
+                                            });
 
         logger.info(result.body);
 
@@ -147,14 +168,16 @@ describe.skip("PUT /api/v1/regencies/:id", function(){
     });
 });
 
-describe.skip("DELETE /api/v1/regencies/:id", function(){
+describe("DELETE /api/v1/regencies/:id", function(){
     let regency:any=null;
 
     beforeEach(async() => {
+        await createUser();
         regency=await createTestRegency();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestRegency();
         await  removeTestProvince();
 
@@ -163,7 +186,8 @@ describe.skip("DELETE /api/v1/regencies/:id", function(){
     it("should can delete regency", async() => {
         let testRegency = await getTestRegency();
 
-        const result=await supertest(server).delete("/api/v1/regencies/"+testRegency.id);
+        const result=await supertest(server).delete("/api/v1/regencies/"+testRegency.id)
+                                            .set("X-API-TOKEN","test");
 
         logger.info(result.body);
 
@@ -175,7 +199,8 @@ describe.skip("DELETE /api/v1/regencies/:id", function(){
     });
 
     it("should return 404 if regency id is not found", async() => {
-        const result=await supertest(server).delete("/api/v1/regencies/99");
+        const result=await supertest(server).delete("/api/v1/regencies/99")
+                                            .set("X-API-TOKEN","test");
 
         logger.info(result.body);
 
@@ -183,7 +208,7 @@ describe.skip("DELETE /api/v1/regencies/:id", function(){
     });
 });
 
-describe.skip("GET /api/v1/regencies/", () => {
+describe("GET /api/v1/regencies/", () => {
     let regency:any=null;
 
     beforeEach(async() => {

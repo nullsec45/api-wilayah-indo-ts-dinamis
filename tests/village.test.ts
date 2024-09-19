@@ -10,9 +10,16 @@ import {
 import { removeTestProvince } from "./utils/province-utills";
 import { removeTestRegency } from "./utils/regency-utils";
 import { createTestDistrict, removeTestDistrict } from "./utils/district-utils";
+import {createUser, deleteUser} from "./utils/user-utils";
 
-describe.skip("POST /api/v1/villages", function(){
+
+describe("POST /api/v1/villages", function(){
+    beforeEach(async() => {
+        await createUser();
+    });
+
     afterEach(async () => {
+        await deleteUser();
         await removeTestVillage();
         await removeTestDistrict();
         await removeTestRegency();
@@ -22,11 +29,13 @@ describe.skip("POST /api/v1/villages", function(){
     it("should can create village", async() => {
         const district=await createTestDistrict();
 
-        const result=await supertest(server).post("/api/v1/villages").send({
-            name:"Village Test",
-            district_id:district.id,
-            postal_code:"1111"
-        });
+        const result=await supertest(server).post("/api/v1/villages")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Village Test",
+                                                district_id:district.id,
+                                                postal_code:"1111"
+                                            });
 
         logger.info(result.body);
 
@@ -35,11 +44,13 @@ describe.skip("POST /api/v1/villages", function(){
     });
     
     it("should reject if district is not found", async() => {
-        const result=await supertest(server).post("/api/v1/villages").send({
-            name:"Village Test",
-            district_id:999,
-            postal_code:"1111"
-        });
+        const result=await supertest(server).post("/api/v1/villages")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Village Test",
+                                                district_id:999,
+                                                postal_code:"1111"
+                                            });
 
         logger.info(result.body);
 
@@ -48,11 +59,13 @@ describe.skip("POST /api/v1/villages", function(){
     });
 
     it("should reject if request is not valid", async() => {
-        const result=await supertest(server).post("/api/v1/villages").send({
-            name:"",
-            district_id:"",
-            postal_code:""
-        });
+        const result=await supertest(server).post("/api/v1/villages")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"",
+                                                district_id:"",
+                                                postal_code:""
+                                            });
 
         logger.info(result.body);
 
@@ -61,14 +74,16 @@ describe.skip("POST /api/v1/villages", function(){
     });
 });
 
-describe.skip("GET /api/v1/villages/:id", function(){
+describe("GET /api/v1/villages/:id", function(){
     let village:any=null;
 
     beforeEach(async() => {
+        await createUser();
        village=await createTestVillage();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestVillage();
         await removeTestDistrict();
         await removeTestRegency();
@@ -94,16 +109,18 @@ describe.skip("GET /api/v1/villages/:id", function(){
     });
 });
 
-describe.skip("PUT /api/v1/villages/:id", function(){
+describe("PUT /api/v1/villages/:id", function(){
     let village:any=null;
     let district:any=null;
 
     beforeEach(async() => {
+        await createUser();
         village=await createTestVillage();
         district=await createTestDistrict();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestVillage();
         await removeTestDistrict();
         await removeTestRegency();
@@ -111,11 +128,13 @@ describe.skip("PUT /api/v1/villages/:id", function(){
     });
 
     it("should can update village", async() => {
-        const result=await supertest(server).put("/api/v1/villages/"+village.id).send({
-            name:"Village Update",
-            district_id: district.id,
-            postal_code:"9999"
-        });;
+        const result=await supertest(server).put("/api/v1/villages/"+village.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Village Update",
+                                                district_id: district.id,
+                                                postal_code:"9999"
+                                            });
 
         logger.info(result.body);
 
@@ -125,11 +144,13 @@ describe.skip("PUT /api/v1/villages/:id", function(){
     });
 
     it("should return 404 if village id is not found", async() => {
-        const result=await supertest(server).put("/api/v1/villages/99999").send({
-            name:"Regency Test",
-            district_id:district.id,
-            postal_code:"9999"
-        });
+        const result=await supertest(server).put("/api/v1/villages/99999")
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Test",
+                                                district_id:district.id,
+                                                postal_code:"9999"
+                                            });
 
         logger.info(result.body);
 
@@ -139,11 +160,13 @@ describe.skip("PUT /api/v1/villages/:id", function(){
 
 
     it("should reject if request not valid", async() => {
-        const result=await supertest(server).put("/api/v1/villages/"+village.id).send({
-            name:"",
-            district_id:"",
-            postal_code:""
-        });
+        const result=await supertest(server).put("/api/v1/villages/"+village.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"",
+                                                district_id:"",
+                                                postal_code:""
+                                            });
 
         logger.info(result.body);
 
@@ -152,11 +175,13 @@ describe.skip("PUT /api/v1/villages/:id", function(){
     });
 
     it("should reject if district is not found", async() => {
-        const result=await supertest(server).put("/api/v1/villages/"+village.id).send({
-            name:"Regency Test",
-            district_id:999,
-            postal_code:""
-        });
+        const result=await supertest(server).put("/api/v1/villages/"+village.id)
+                                            .set("X-API-TOKEN","test")
+                                            .send({
+                                                name:"Regency Test",
+                                                district_id:999,
+                                                postal_code:"99999"
+                                            });
 
         logger.info(result.body);
 
@@ -169,10 +194,12 @@ describe("DELETE /api/v1/villages/:id",() => {
     let village:any=null;
 
     beforeEach(async() => {
+        await createUser();
         village=await createTestVillage();
     });
 
     afterEach(async() => {
+        await deleteUser();
         await removeTestVillage();
         await removeTestDistrict();
         await removeTestRegency();
@@ -183,7 +210,8 @@ describe("DELETE /api/v1/villages/:id",() => {
         let testVillage = await getTestVillage();
        
 
-        const result=await supertest(server).delete("/api/v1/villages/"+testVillage.id);
+        const result=await supertest(server).delete("/api/v1/villages/"+testVillage.id)
+                                            .set("X-API-TOKEN","test");
 
         logger.info(result.body);
 
@@ -195,7 +223,8 @@ describe("DELETE /api/v1/villages/:id",() => {
     });
 
     it("should return 404 if village id is not found", async() => {
-        const result=await supertest(server).delete("/api/v1/villages/99");
+        const result=await supertest(server).delete("/api/v1/villages/99")
+                                            .set("X-API-TOKEN","test");
 
         logger.info(result.body);
 
@@ -203,7 +232,7 @@ describe("DELETE /api/v1/villages/:id",() => {
     });
 });
 
-describe.skip("GET /api/v1/villages/", () => {
+describe("GET /api/v1/villages/", () => {
     let village:any=null;
 
     beforeEach(async() => {
