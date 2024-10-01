@@ -66,6 +66,36 @@ describe("POST /api/v1/districts", function(){
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
+
+     it("should reject if token is missing", async() => {
+        const result=await supertest(server)
+                            .post("/api/v1/districts")
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const result=await supertest(server)
+                            .post("/api/v1/districts")
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("GET /api/v1/districts/:id", function(){
@@ -169,6 +199,36 @@ describe("PUT /api/v1/districts/:id", function(){
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
     });
+
+    it("should reject if token is missing", async() => {
+        const result=await supertest(server)
+                           .put("/api/v1/districts/"+district.id)
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const result=await supertest(server)
+                           .put("/api/v1/districts/"+district.id)
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("DELETE /api/v1/districts/:id",() => {
@@ -209,6 +269,34 @@ describe("DELETE /api/v1/districts/:id",() => {
         logger.info(result.body);
 
         expect(result.status).toBe(404);
+    });
+
+    it("should reject if token is missing", async() => {
+        let testDistrict = await getTestDistrict();
+
+        const result=await supertest(server)
+                            .delete("/api/v1/districts/"+testDistrict.id)
+                            .set("X-API-TOKEN","");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        let testDistrict = await getTestDistrict();
+
+        const result=await supertest(server)
+                            .delete("/api/v1/districts/"+testDistrict.id)
+                            .set("X-API-TOKEN","salah");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
     });
 });
 
