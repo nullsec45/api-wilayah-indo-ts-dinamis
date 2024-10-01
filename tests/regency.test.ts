@@ -65,6 +65,43 @@ describe("POST /api/v1/regencies ", function(){
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
+
+    it("should reject if token is missing", async() => {
+        const province=await createTestProvince();
+
+        const result=await supertest(server)
+                            .post("/api/v1/regencies")
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test",
+                                province_id:province.id
+
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const province=await createTestProvince();
+
+        const result=await supertest(server)
+                            .post("/api/v1/regencies")
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test",
+                                province_id:province.id
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("GET /api/v1/regencies/:id", function(){
@@ -166,6 +203,43 @@ describe("PUT /api/v1/regencies/:id", function(){
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
     });
+
+    it("should reject if token is missing", async() => {
+        const province=await createTestProvince();
+
+        const result=await supertest(server)
+                            .put("/api/v1/regencies/"+regency.id)
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test",
+                                province_id:province.id
+
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const province=await createTestProvince();
+
+        const result=await supertest(server)
+                            .put("/api/v1/regencies/"+regency.id)
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test",
+                                province_id:province.id
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("DELETE /api/v1/regencies/:id", function(){
@@ -205,6 +279,35 @@ describe("DELETE /api/v1/regencies/:id", function(){
         logger.info(result.body);
 
         expect(result.status).toBe(404);
+    });
+
+    it("should reject if token is missing", async() => {
+        let testRegency = await getTestRegency();
+ 
+
+        const result=await supertest(server)
+                            .delete("/api/v1/regencies/"+testRegency.id)
+                            .set("X-API-TOKEN","");
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        let testRegency = await getTestRegency();
+
+
+        const result=await supertest(server)
+                            .delete("/api/v1/regencies/"+testRegency.id)
+                            .set("X-API-TOKEN","salah");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
     });
 });
 
