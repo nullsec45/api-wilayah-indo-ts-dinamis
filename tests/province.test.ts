@@ -45,6 +45,36 @@ describe("POST /api/v1/provinces", function(){
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
+
+    it("should reject if token is missing", async() => {
+        const result=await supertest(server)
+                            .post("/api/v1/provinces")
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const result=await supertest(server)
+                            .post("/api/v1/provinces")
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("GET /api/v1/provinces/:id", function(){
@@ -126,6 +156,37 @@ describe("PUT /api/v1/provinces/:id", function(){
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
+
+
+    it("should reject if token is missing", async() => {
+        const result=await supertest(server)
+                           .put("/api/v1/provinces/"+province.id)
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const result=await supertest(server)
+                           .put("/api/v1/provinces/"+province.id)
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("DELETE /api/v1/provinces/:id", function(){
@@ -163,6 +224,40 @@ describe("DELETE /api/v1/provinces/:id", function(){
                             .set("X-API-TOKEN","test");
 
         expect(result.status).toBe(404);
+    });
+
+    it("should reject if token is missing", async() => {
+        let testProvince = await getTestProvince();
+
+        const result=await supertest(server)
+                            .delete("/api/v1/provinces/"+testProvince.id)
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        let testProvince = await getTestProvince();
+
+        const result=await supertest(server)
+                            .delete("/api/v1/provinces/"+testProvince.id)
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
     });
 });
 
