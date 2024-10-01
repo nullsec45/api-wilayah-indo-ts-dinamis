@@ -72,6 +72,44 @@ describe("POST /api/v1/villages", function(){
         expect(result.status).toBe(400);
         expect(result.body.errors).toBeDefined();
     });
+
+      it("should reject if token is missing", async() => {
+        const district=await createTestDistrict();
+
+        const result=await supertest(server)
+                            .post("/api/v1/villages")
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test",
+                                district_id:district.id,
+                                postal_code:"1111"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const district=await createTestDistrict();
+
+        const result=await supertest(server)
+                            .post("/api/v1/villages")
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test",
+                                district_id:district.id,
+                                postal_code:"1111"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("GET /api/v1/villages/:id", function(){
@@ -188,6 +226,40 @@ describe("PUT /api/v1/villages/:id", function(){
         expect(result.status).toBe(404);
         expect(result.body.errors).toBeDefined();
     });
+
+    it("should reject if token is missing", async() => {
+        const result=await supertest(server)
+                           .put("/api/v1/villages/"+district.id)
+                            .set("X-API-TOKEN","")
+                            .send({
+                                name:"Test",
+                                district_id:district.id,
+                                postal_code:"9999"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        const result=await supertest(server)
+                           .put("/api/v1/villages/"+district.id)
+                            .set("X-API-TOKEN","salah")
+                            .send({
+                                name:"Test",
+                                district_id:district.id,
+                                postal_code:"9999"
+                            });
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
+    });
 });
 
 describe("DELETE /api/v1/villages/:id",() => {
@@ -229,6 +301,34 @@ describe("DELETE /api/v1/villages/:id",() => {
         logger.info(result.body);
 
         expect(result.status).toBe(404);
+    });
+
+     it("should reject if token is missing", async() => {
+        let testVillage = await getTestVillage();
+
+        const result=await supertest(server)
+                            .delete("/api/v1/villages/"+testVillage.id)
+                            .set("X-API-TOKEN","");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Token is missing");
+    });
+
+    it("should reject if token is invalid", async() => {
+        let testVillage = await getTestVillage();
+
+        const result=await supertest(server)
+                            .delete("/api/v1/villages/"+testVillage.id)
+                            .set("X-API-TOKEN","salah");
+
+        logger.info(result.body);
+
+        expect(result.status).toBe(401);
+        expect(result.body.errors).toBeDefined();
+        expect(result.body.errors).toBe("Unauthorized: Invalid token");
     });
 });
 
