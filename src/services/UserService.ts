@@ -11,9 +11,10 @@ import ProvinceService from "./ProvinceService";
 import bcrypt from "bcrypt";
 import { toUserResponse } from "../../models/user-model";
 import {v4 as uuid} from "uuid";
+import { CreateUserRequest, LoginUserRequest } from "../models/user-model";
 
 class UserService{
-    static async login(request:Request){
+    static async login(request:LoginUserRequest){
         const login=Validation.validate(loginUserValidation, request);
 
         let user=await prismaClient.user.findFirst({
@@ -47,7 +48,7 @@ class UserService{
 
     }
 
-    static async register(request:Request){
+    static async register(request:CreateUserRequest){
         const register=Validation.validate(registerUserValidation, request);
 
         const totalUserWithSameUser=await prismaClient.user.count({
