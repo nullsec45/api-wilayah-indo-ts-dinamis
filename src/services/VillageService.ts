@@ -8,7 +8,7 @@ import {
 } from "../validations/village-validation";
 import ResponseError from "../errors/ResponseError";
 import DistrictService from "./DistrictService";
-import { logger } from "../applications/logging";
+import { CreateVillageRequest, VillageResponse, toVillageResponse } from "../models/village-model";
 
 
 class VillageService{
@@ -16,25 +16,38 @@ class VillageService{
         return prismaClient.village.findMany({});
     }
 
-    static async create(request:Request){
-        const village=Validation.validate(createVillageValidation, request);
+    static async create(request:CreateVillageRequest):Promise<VillageResponse>{
+        const villageRequest=Validation.validate(createVillageValidation, request);
         
-        if(!await DistrictService.checkExistsDistrict(village.district_id)){
+        if(!await DistrictService.checkExistsDistrict(villageRequest.district_id)){
             throw new ResponseError(404, "District is not found");
         }
 
-        return prismaClient.village.create({
-            data:village,
+        const village=await prismaClient.village.create({
+            data:villageRequest,
             select:{
                 id:true,
                 district_id:true,
                 name:true,
                 postal_code:true
             }
-        })
+        });
+
+        return toVillageResponse(village);
     }
 
-    static async get(id:number){
+
+    static async checkExistsVillage(id:number){
+        const checkVillage = await prismaClient.village.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkVillage !== null;  
+    }
+
+    static async get(id:number):Promise<VillageResponse>{
         const districtId=Validation.validate(getVillageValidation, id);
 
         const village=await prismaClient.village.findFirst({
@@ -53,11 +66,11 @@ class VillageService{
             throw new ResponseError(404, "Village is not found");
         }
 
-        return village;
+        return toVillageResponse(village);
     }
 
-    static async update(id:number, request:Request){
-        const village=Validation.validate(updateVillageValidation, request);
+    static async update(id:number, request:Request):Promise<VillageResponse>{
+        const villageRequest=Validation.validate(updateVillageValidation, request);
 
         const checkVillage = await prismaClient.village.count({
             where: {
@@ -69,18 +82,18 @@ class VillageService{
             throw new ResponseError(404, "Village is not found!");
         }
 
-        if(!await DistrictService.checkExistsDistrict(village.district_id)){
+        if(!await DistrictService.checkExistsDistrict(villageRequest.district_id)){
             throw new ResponseError(404, "District is not found");
         }
 
-        return prismaClient.village.update({
+        const village= await prismaClient.village.update({
             where:{
                 id
             },
             data:{
-                name:village.name,
-                district_id:village.district_id,
-                postal_code:village.postal_code
+                name:villageRequest.name,
+                district_id:villageRequest.district_id,
+                postal_code:villageRequest.postal_code
             },
             select:{
                 id:true,
@@ -89,9 +102,10 @@ class VillageService{
                 postal_code:true
             }
         });
+        return toVillageResponse(village);
     }
 
-    static async remove(id:number){
+    static async remove(id:number):Promise<VillageResponse>{
        const villageId=Validation.validate(getVillageValidation, id);
 
         const checkVillage = await prismaClient.village.count({
@@ -104,23 +118,14 @@ class VillageService{
             throw new ResponseError(404, "Village is not found");
         }
 
-        return prismaClient.village.delete({
+        const village= await prismaClient.village.delete({
             where: {
               id: villageId,
             },
         });
-    }   
 
-
-    static async checkExistsVillage(id:number){
-        const checkVillage = await prismaClient.village.findFirst({
-            where: {
-                id,
-            },
-        });
-
-        return checkVillage !== null;  
-    }
+        return toVillageResponse(village);
+    } 
 }
 
 export default VillageService;
