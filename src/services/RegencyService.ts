@@ -8,31 +8,44 @@ import {
 } from "../validations/regency-validation";
 import ResponseError from "../errors/ResponseError";
 import ProvinceService from "./ProvinceService";
+import { CreateRegencyRequest, RegencyResponse, toRegencyResponse, UpdateRegencyRequest } from "../models/regency-model";
 
 class RegencyService{
     static index(){
         return prismaClient.regency.findMany({});
     }
 
-    static async create(request:Request){
-        const regency=Validation.validate(createRegencyValidation, request);
+    static async create(request:CreateRegencyRequest):Promise<RegencyResponse>{
+        const regencyRequest=Validation.validate(createRegencyValidation, request);
 
         
-        if(!await ProvinceService.checkExistsProvince(regency.province_id)){
+        if(!await ProvinceService.checkExistsProvince(regencyRequest.province_id)){
             throw new ResponseError(404, "Province is not found");
         }
 
-        return prismaClient.regency.create({
-            data:regency,
+        const regency=await prismaClient.regency.create({
+            data:regencyRequest,
             select:{
                 id:true,
                 province_id:true,
                 name:true
             }
         })
+
+        return toRegencyResponse(regency);
     }
 
-    static async get(id:number){
+     static async checkExistsRegency(id:number){
+        const checkRegency = await prismaClient.regency.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkRegency !== null;  
+    }
+
+    static async get(id:number):Promise<RegencyResponse>{
         const regencyId=Validation.validate(getRegencyValidation, id);
 
         const regency=await prismaClient.regency.findFirst({
@@ -50,33 +63,29 @@ class RegencyService{
             throw new ResponseError(404, "Regency is not found");
         }
 
-        return regency;
+        return toRegencyResponse(regency);
     }
 
-    static async update(id:number, request:Request){
-        const regency=Validation.validate(updateRegencyValidation, request);
+    static async update(id:number, request:UpdateRegencyRequest){
+        const regencyRequest=Validation.validate(updateRegencyValidation, request);
 
-        const checkRegency = await prismaClient.regency.count({
-            where: {
-                id
-            },
-        });
-
-        if (checkRegency == 0) {
-            throw new ResponseError(404, "Regency is not found!");
-        }
-
-        if(!await ProvinceService.checkExistsProvince(regency.province_id)){
+        if(!await ProvinceService.checkExistsProvince(regencyRequest.province_id)){
             throw new ResponseError(404, "Province is not found");
         }
 
-        return prismaClient.regency.update({
+        const checkRegency = await RegencyService.checkExistsRegency(id);
+        
+        if (!checkRegency) {
+            throw new ResponseError(404, "Regency is not found!");
+        }
+
+        const regency= await prismaClient.regency.update({
             where:{
                 id
             },
             data:{
-                name:regency.name,
-                province_id:regency.province_id
+                name:regencyRequest.name,
+                province_id:regencyRequest.province_id
             },
             select:{
                 id:true,
@@ -84,38 +93,27 @@ class RegencyService{
                 name:true
             }
         });
+
+        return toRegencyResponse(regency);
     }
 
-    static async remove(id:number){
+    static async remove(id:number):Promise<RegencyResponse>{
        const regencyId=Validation.validate(getRegencyValidation, id);
 
-        const checkRegency = await prismaClient.regency.count({
-            where: {
-                id:regencyId,
-            },
-        });
+        const checkRegency = await RegencyService.checkExistsRegency(regencyId);
 
-        if (checkRegency == 0) {
+        if (!checkRegency) {
             throw new ResponseError(404, "Regency is not found");
         }
 
-        return prismaClient.regency.delete({
+        const regency= await prismaClient.regency.delete({
             where: {
               id: regencyId,
             },
         });
+
+        return toRegencyResponse(regency);
     }   
-
-
-    static async checkExistsRegency(id:number){
-        const checkProvince = await prismaClient.regency.findFirst({
-            where: {
-                id,
-            },
-        });
-
-        return checkProvince !== null;  
-    }
 }
 
 export default RegencyService;
