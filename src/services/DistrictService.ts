@@ -8,31 +8,44 @@ import {
 } from "../validations/district-validation";
 import ResponseError from "../errors/ResponseError";
 import RegencyService from "./RegencyService";
+import { CreateDistrictRequest, DistrictResponse, toDistrictResponse } from "../models/district-model";
 
 class DistrictService{
     static index(){
         return prismaClient.district.findMany({});
     }
 
-    static async create(request:Request){
-        const district=Validation.validate(createDistrictValidation, request);
+    static async create(request:CreateDistrictRequest):Promise<DistrictResponse>{
+        const districtRequest=Validation.validate(createDistrictValidation, request);
 
         
-        if(!await RegencyService.checkExistsRegency(district.regency_id)){
+        if(!await RegencyService.checkExistsRegency(districtRequest.regency_id)){
             throw new ResponseError(404, "Regency is not found");
         }
 
-        return prismaClient.district.create({
-            data:district,
+        const district=  await prismaClient.district.create({
+            data:districtRequest,
             select:{
                 id:true,
                 regency_id:true,
                 name:true
             }
-        })
+        });
+
+        return toDistrictResponse(district);
     }
 
-    static async get(id:number){
+    static async checkExistsDistrict(id:number){
+        const checkDistrict = await prismaClient.district.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkDistrict !== null;  
+    }
+
+    static async get(id:number):Promise<DistrictResponse>{
         const regencyId=Validation.validate(getDistrictValidation, id);
 
         const district=await prismaClient.district.findFirst({
@@ -50,33 +63,29 @@ class DistrictService{
             throw new ResponseError(404, "District is not found");
         }
 
-        return district;
+        return toDistrictResponse(district);
     }
 
     static async update(id:number, request:Request){
-        const district=Validation.validate(updateDistrictValidation, request);
+        const districtRequest=Validation.validate(updateDistrictValidation, request);
 
-        const checkRegency = await prismaClient.district.count({
-            where: {
-                id
-            },
-        });
-
-        if (checkRegency == 0) {
-            throw new ResponseError(404, "Regency is not found!");
-        }
-
-        if(!await RegencyService.checkExistsRegency(district.regency_id)){
+        if(!await RegencyService.checkExistsRegency(districtRequest.regency_id)){
             throw new ResponseError(404, "Regency is not found");
         }
 
-        return prismaClient.district.update({
+        const checkDistrict = await DistrictService.checkExistsDistrict(id);
+
+        if (!checkDistrict) {
+            throw new ResponseError(404, "District is not found!");
+        }
+
+        const district= await prismaClient.district.update({
             where:{
                 id
             },
             data:{
-                name:district.name,
-                regency_id:district.regency_id
+                regency_id:districtRequest.regency_id,
+                name:districtRequest.name,
             },
             select:{
                 id:true,
@@ -84,36 +93,26 @@ class DistrictService{
                 name:true
             }
         });
+
+        return toDistrictResponse(district);
     }
 
-    static async remove(id:number){
+    static async remove(id:number):Promise<DistrictResponse>{
        const regencyId=Validation.validate(getDistrictValidation, id);
+    
+       const checkDistrict = await DistrictService.checkExistsDistrict(regencyId);
 
-        const checkRegency = await prismaClient.district.count({
-            where: {
-                id:regencyId,
-            },
-        });
-
-        if (checkRegency == 0) {
+        if (!checkDistrict) {
             throw new ResponseError(404, "District is not found");
         }
 
-        return prismaClient.district.delete({
+        const district=await prismaClient.district.delete({
             where: {
               id: regencyId,
             },
         });
-    }
-    
-     static async checkExistsDistrict(id:number){
-        const checkDistrict = await prismaClient.district.findFirst({
-            where: {
-                id,
-            },
-        });
 
-        return checkDistrict !== null;  
+        return toDistrictResponse(district);
     }
 }
 
