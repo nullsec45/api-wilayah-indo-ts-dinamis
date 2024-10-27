@@ -8,25 +8,40 @@ import {
 
 } from "../validations/province-validation";
 import ResponseError from "../errors/ResponseError";
+import { CreateProvinceRequest, ProvinceResponse, toProvinceResponse, UpdateProvinceRequest } from "../models/province-model";
 
 class ProvinceService{
     static index(){
         return prismaClient.province.findMany({});
     }
 
-    static create(request:Request){
-        const province=Validation.validate(createProvinceValidation, request);
+    static async create(request:CreateProvinceRequest):Promise<ProvinceResponse>{
+        const provinceRequest=Validation.validate(createProvinceValidation, request);
 
-        return prismaClient.province.create({
-            data:province,
+        const province= await prismaClient.province.create({
+            data:provinceRequest,
             select:{
                 id:true,
                 name:true
             }
-        })
+        });
+
+        return toProvinceResponse(province);
     }
 
-    static async get(id:number){
+
+    static async checkExistsProvince(id:number){
+        const checkProvince = await prismaClient.province.findFirst({
+            where: {
+                id,
+            },
+        });
+
+        return checkProvince !== null;  
+    }
+
+
+    static async get(id:number):Promise<ProvinceResponse>{
         const provinceId=Validation.validate(getProvinceValidation, id);
 
         const province=await prismaClient.province.findFirst({
@@ -43,65 +58,55 @@ class ProvinceService{
             throw new ResponseError(404, "Province is not found");
         }
 
-        return province;
+        return toProvinceResponse(province);
     }
 
-    static async update(id:number, request:Request){
-        const province=Validation.validate(updateProvinceValidation, request);
+    static async update(id:number, request:UpdateProvinceRequest):Promise<ProvinceResponse>{
+        const provinceRequest=Validation.validate(updateProvinceValidation, request);
 
-        const checkProvince = await prismaClient.province.count({
-            where: {
-                id
-            },
-        });
+        const checkProvince = await ProvinceService.checkExistsProvince(provinceRequest.id);
 
-        if (checkProvince == 0) {
+        if (!checkProvince) {
             throw new ResponseError(404, "Province is not found!");
         }
 
-        return prismaClient.province.update({
+        const province= await prismaClient.province.update({
             where:{
                 id
             },
             data:{
-                name:province.name
+                name:provinceRequest.name
             },
             select:{
                 id:true,
                 name:true
             }
         });
+
+        return toProvinceResponse(province);
     }
 
-    static async remove(id:number){
+    static async remove(id:number):Promise<ProvinceResponse>{
        const provinceId =Validation.validate(getProvinceValidation, id);
 
-        const checkProvince = await prismaClient.province.count({
-            where: {
-                id:provinceId,
-            },
-        });
+        const checkProvince =await ProvinceService.checkExistsProvince(provinceId);
 
-        if (checkProvince == 0) {
+        console.log(checkProvince);
+
+        if (!checkProvince) {
+            console.log("kontol");
             throw new ResponseError(404, "Province is not found");
         }
 
-        return prismaClient.province.delete({
+        const province= await prismaClient.province.delete({
             where: {
               id: provinceId,
             },
         });
+
+        return toProvinceResponse(province);
     }
 
-    static async checkExistsProvince(id:number){
-        const checkProvince = await prismaClient.province.findFirst({
-            where: {
-                id,
-            },
-        });
-
-        return checkProvince !== null;  
-    }
 }
 
 export default ProvinceService;
